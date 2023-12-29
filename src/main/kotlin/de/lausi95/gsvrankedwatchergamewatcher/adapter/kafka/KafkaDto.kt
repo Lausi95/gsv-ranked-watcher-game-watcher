@@ -11,6 +11,3 @@ internal data class PlayersUpdatedMessage(
 )
 
 const val MATCH_PLAYED_TOPIC = "match_played"
-internal data class MatchPlayedMessage(
-  val matchId: String
-)

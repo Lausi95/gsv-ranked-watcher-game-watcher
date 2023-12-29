@@ -18,8 +18,6 @@ private class KafkaProducers(val kafkaTemplate: KafkaTemplate<String, String>, v
   }
 
   override fun reportMatch(match: Match) {
-    TODO("Properly map the match to a DTO")
-    val matchPlayedMessage = MatchPlayedMessage(match.matchId)
-    kafkaTemplate.send(MATCH_PLAYED_TOPIC, objectMapper.writeValueAsString(matchPlayedMessage))
+    kafkaTemplate.send(MATCH_PLAYED_TOPIC, objectMapper.writeValueAsString(match))
   }
 }
