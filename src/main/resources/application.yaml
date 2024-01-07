@@ -1,15 +1,14 @@
 spring:
-  kafka:
-    consumer:
-      bootstrap-servers: ${KAFKA_URL}
-      group-id: player-manager
-      auto-offset-reset: latest
-      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-    producer:
-      bootstrap-servers: ${KAFKA_URL}
-      key-serializer: org.apache.kafka.common.serialization.StringSerializer
-      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+  data:
+    mongodb:
+      host: ${MONGO_HOST}
+      database: game-watcher
+
+player-manager:
+  host: ${PLAYER_MANAGER_HOST}
+
+discord-reporter:
+  host: ${GAME_REPORTER_HOST}
 
 riot:
   api-key: ${RIOT_API_KEY}

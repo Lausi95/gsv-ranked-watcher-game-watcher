@@ -1,4 +1,4 @@
-package de.lausi95.gsvrankedwatchergamewatcher.adapter.internal
+package de.lausi95.gsvrankedwatchergamewatcher.adapter.scheduling
 
 import de.lausi95.gsvrankedwatchergamewatcher.application.MatchApplicationService
 import org.slf4j.LoggerFactory
