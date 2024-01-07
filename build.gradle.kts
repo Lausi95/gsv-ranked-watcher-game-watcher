@@ -34,7 +34,7 @@ dependencies {
 
   annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
 
-  implementation("com.github.kimcore:riot.kt:1.0")
+  implementation("com.github.kimcore:riot.kt:1.1")
 
   implementation("org.jetbrains.kotlin:kotlin-reflect")
   implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.0-RC")
