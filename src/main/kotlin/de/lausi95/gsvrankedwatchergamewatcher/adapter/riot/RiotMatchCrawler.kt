@@ -21,7 +21,7 @@ private class RiotMatchCrawler : MatchCrawler {
   override fun crawlMatches(summonerIds: List<String>, shouldReportMatch: (matchId: String) -> Boolean, reportMatch: (Match) -> Unit) {
     runBlocking {
       coroutineScope {
-        val matchIds = summonerIds.map { summonerId -> async { RiotAPI.match.getMatchIdsByPUUID(summonerId) } }
+        val matchIds = summonerIds.map { summonerId -> async { RiotAPI.match.getMatchIdsByPUUID(summonerId, count = 1) } }
           .flatMap { it.await() }
           .distinct()
 
