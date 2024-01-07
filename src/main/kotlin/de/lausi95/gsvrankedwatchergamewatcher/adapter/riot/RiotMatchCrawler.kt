@@ -27,7 +27,7 @@ private class RiotMatchCrawler : MatchCrawler {
 
         matchIds.forEach { matchId ->
           launch {
-            if (shouldReportMatch(matchId)) {
+            if (!shouldReportMatch(matchId)) {
               return@launch
             }
 

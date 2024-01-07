@@ -22,7 +22,10 @@ class MatchApplicationService(
     log.info("Reporting matches for summoner ids: $summonerIds")
 
     matchCrawler.crawlMatches(summonerIds, { !matchRepository.existsById(it) }) {
+      log.info("Reporting match ${it.matchId}.")
       matchReporter.reportMatch(it)
+
+      log.info("Marking match ${it.matchId} as reported.")
       matchRepository.save(it)
     }
   }
