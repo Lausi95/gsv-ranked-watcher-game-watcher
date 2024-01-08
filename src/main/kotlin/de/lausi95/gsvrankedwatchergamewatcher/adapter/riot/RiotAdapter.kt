@@ -12,6 +12,7 @@ data class MetadataDto(
 )
 
 data class InfoDto(
+  val gameId: Long,
   val gameDuration: Long,
   val gameEndTimestamp: Long? = null,
   val gameStartTimestamp: Long,

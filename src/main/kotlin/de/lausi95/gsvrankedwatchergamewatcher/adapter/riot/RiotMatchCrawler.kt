@@ -49,6 +49,6 @@ private class RiotMatchCrawler(private val riotAdapter: RiotAdapter) : MatchCraw
       )
     }
 
-    return Match(matchDto.metadata.matchId, win, participants)
+    return Match(matchDto.info.gameId.toString(), win, participants)
   }
 }
