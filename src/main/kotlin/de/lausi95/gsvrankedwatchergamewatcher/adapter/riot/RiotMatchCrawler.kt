@@ -1,46 +1,31 @@
 package de.lausi95.gsvrankedwatchergamewatcher.adapter.riot
 
-import com.github.kimcore.riot.RiotAPI
 import com.github.kimcore.riot.routes.MatchDto
 import de.lausi95.gsvrankedwatchergamewatcher.domain.model.match.Match
 import de.lausi95.gsvrankedwatchergamewatcher.domain.model.match.MatchCrawler
 import de.lausi95.gsvrankedwatchergamewatcher.domain.model.match.Participant
-import kotlinx.coroutines.async
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import org.springframework.stereotype.Component
 
 @Component
-private class RiotMatchCrawler : MatchCrawler {
+private class RiotMatchCrawler(private val riotAdapter: RiotAdapter) : MatchCrawler {
 
   companion object {
     private val QUEUE_IDS = listOf(420, 440)
   }
 
   override fun crawlMatches(summonerIds: List<String>, shouldReportMatch: (matchId: String) -> Boolean, reportMatch: (Match) -> Unit) {
-    runBlocking {
-      coroutineScope {
-        val matchIds = summonerIds.map { summonerId -> async { RiotAPI.match.getMatchIdsByPUUID(summonerId, count = 1) } }
-          .flatMap { it.await() }
-          .distinct()
-
-        matchIds.forEach { matchId ->
-          launch {
-            if (!shouldReportMatch(matchId)) {
-              return@launch
-            }
-
-            val riotMatch = RiotAPI.match.getMatch(matchId)
-            if (!QUEUE_IDS.contains(riotMatch.info.queueId)) {
-              return@launch
-            }
-
-            val match: Match = mapToMatch(riotMatch, summonerIds)
-            reportMatch(match)
-          }
-        }
+    summonerIds.flatMap { summonerId -> riotAdapter.getLatestMatchIds(summonerId) }.distinct().forEach { matchId ->
+      if (!shouldReportMatch(matchId)) {
+        return
       }
+
+      val riotMatch = riotAdapter.getMatch(matchId)
+      if (!QUEUE_IDS.contains(riotMatch.info.queueId)) {
+        return
+      }
+
+      val match: Match = mapToMatch(riotMatch, summonerIds)
+      reportMatch(match)
     }
   }
 
