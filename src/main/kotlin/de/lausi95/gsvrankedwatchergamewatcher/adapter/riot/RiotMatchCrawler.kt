@@ -1,6 +1,5 @@
 package de.lausi95.gsvrankedwatchergamewatcher.adapter.riot
 
-import com.github.kimcore.riot.routes.MatchDto
 import de.lausi95.gsvrankedwatchergamewatcher.domain.model.match.Match
 import de.lausi95.gsvrankedwatchergamewatcher.domain.model.match.MatchCrawler
 import de.lausi95.gsvrankedwatchergamewatcher.domain.model.match.Participant
