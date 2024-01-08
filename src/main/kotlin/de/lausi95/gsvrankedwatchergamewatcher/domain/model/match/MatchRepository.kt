@@ -4,5 +4,5 @@ interface MatchRepository {
 
   fun existsById(matchId: String): Boolean
 
-  fun save(match: Match)
+  fun save(matchId: String)
 }

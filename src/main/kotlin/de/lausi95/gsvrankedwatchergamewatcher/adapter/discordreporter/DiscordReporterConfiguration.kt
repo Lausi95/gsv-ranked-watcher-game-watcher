@@ -12,6 +12,6 @@ private class DiscordReporterConfiguration {
   @Bean
   fun matchReporter(@Value("\${discord-reporter.host}") matchReporterHost: String): MatchReporter {
     val restTemplate = RestTemplateBuilder().rootUri(matchReporterHost).build()
-    return DiscordMatchReporter(restTemplate)
+    return DiscordReporterAdapter(restTemplate)
   }
 }

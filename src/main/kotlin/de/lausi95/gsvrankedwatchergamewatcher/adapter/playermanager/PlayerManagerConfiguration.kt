@@ -12,6 +12,6 @@ private class PlayerManagerConfiguration {
   @Bean
   fun playerRepository(@Value("\${player-manager.host}") playerManagerHost: String): PlayerRepository {
     val restTemplate = RestTemplateBuilder().rootUri(playerManagerHost).build()
-    return PlayerManagerPlayerRepository(restTemplate)
+    return PlayerManagerAdapter(restTemplate)
   }
 }

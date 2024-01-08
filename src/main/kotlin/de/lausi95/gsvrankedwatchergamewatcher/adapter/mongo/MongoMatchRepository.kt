@@ -1,6 +1,5 @@
 package de.lausi95.gsvrankedwatchergamewatcher.adapter.mongo
 
-import de.lausi95.gsvrankedwatchergamewatcher.domain.model.match.Match
 import de.lausi95.gsvrankedwatchergamewatcher.domain.model.match.MatchRepository
 import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.repository.MongoRepository
@@ -17,8 +16,8 @@ private class MongoMatchRepository(private val repository: InternalMongoReposito
     return repository.existsById(matchId)
   }
 
-  override fun save(match: Match) {
-    val matchEntity = MatchEntity(match.matchId)
+  override fun save(matchId: String) {
+    val matchEntity = MatchEntity(matchId)
     repository.save(matchEntity)
   }
 }

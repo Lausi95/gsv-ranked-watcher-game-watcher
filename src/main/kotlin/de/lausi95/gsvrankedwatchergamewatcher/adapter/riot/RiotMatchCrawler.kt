@@ -1,61 +1,67 @@
 package de.lausi95.gsvrankedwatchergamewatcher.adapter.riot
 
-import de.lausi95.gsvrankedwatchergamewatcher.domain.model.match.Match
-import de.lausi95.gsvrankedwatchergamewatcher.domain.model.match.MatchCrawler
-import de.lausi95.gsvrankedwatchergamewatcher.domain.model.match.Participant
+import de.lausi95.gsvrankedwatchergamewatcher.domain.model.match.*
 import de.lausi95.gsvrankedwatchergamewatcher.domain.model.player.SummonerId
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 
+private val QUEUE_IDS = listOf(420, 440)
+
 @Component
 private class RiotMatchCrawler(private val riotAdapter: RiotAdapter) : MatchCrawler {
 
-  companion object {
-    private val QUEUE_IDS = listOf(420, 440)
-  }
-
   private val log = LoggerFactory.getLogger(RiotMatchCrawler::class.java)
 
-  override fun crawlMatches(summonerIds: List<SummonerId>, shouldReportMatch: (matchId: String) -> Boolean, reportMatch: (Match) -> Unit) {
-    summonerIds.flatMap { summonerId -> riotAdapter.getLatestMatchIds(summonerId) }.distinct().forEach { matchId ->
-      if (!shouldReportMatch(matchId)) {
-        log.info("Not Reporting match $matchId. Already reported.")
-        return@forEach
-      }
-
-      val riotMatch = riotAdapter.getMatch(matchId)
-      if (!QUEUE_IDS.contains(riotMatch.info.queueId)) {
-        log.info("Not reporting match $matchId. Not a ranked match.")
-        return@forEach
-      }
-
-      val match: Match = mapToMatch(matchId, riotMatch, summonerIds)
-      reportMatch(match)
-    }
+  override fun crawlMatches(summonerIds: List<SummonerId>, predicate: MatchPredicate, matchCallback: MatchCallback) {
+    summonerIds
+      .flatMap { riotAdapter.getLatestMatchIds(it) }
+      .distinct()
+      .forEach { processMatch(it, summonerIds, predicate, matchCallback) }
   }
 
-  fun mapToMatch(matchId: String, matchDto: MatchDto, summonerIds: List<SummonerId>): Match {
-    val summonerIdValues = summonerIds.map { it.value }
-    val participantDtos = matchDto.info.participants.filter {
-      summonerIdValues.contains(it.puuid)
+  private fun processMatch(matchId: String, summonerIds: List<SummonerId>, predicate: MatchPredicate, matchCallback: MatchCallback) {
+    log.info("Processing match '${matchId}'.")
+
+    if (!predicate(matchId)) {
+      log.info("Not processing match $matchId. Already processed.")
+      return
     }
 
-    val win = participantDtos.any { it.win }
-
-    val participants = participantDtos.map {
-      Participant(
-        it.summonerId,
-        it.summonerName,
-        it.championName,
-        it.role,
-        it.kills,
-        it.deaths,
-        it.assists,
-        it.pentaKills > 0,
-        it.quadraKills > 0
-      )
+    val matchDto = riotAdapter.getMatch(matchId)
+    if (!isRankedMatch(matchDto.info.queueId)) {
+      log.info("Not reporting match $matchId. Not a ranked match.")
+      return
     }
 
-    return Match(matchId, win, participants)
+    matchCallback(matchDto.mapToMatch(summonerIds))
   }
+}
+
+fun isRankedMatch(queueId: Int): Boolean {
+  return QUEUE_IDS.contains(queueId)
+}
+
+fun MatchDto.mapToMatch(summonerIds: List<SummonerId>): Match {
+  val summonerIdValues = summonerIds.map { it.value }
+  val participantDtos = info.participants.filter {
+    summonerIdValues.contains(it.puuid)
+  }
+
+  val win = participantDtos.any { it.win }
+
+  val participants = participantDtos.map {
+    Participant(
+      it.summonerId,
+      it.summonerName,
+      it.championName,
+      it.role,
+      it.kills,
+      it.deaths,
+      it.assists,
+      it.pentaKills > 0,
+      it.quadraKills > 0
+    )
+  }
+
+  return Match(metadata.matchId, win, participants)
 }

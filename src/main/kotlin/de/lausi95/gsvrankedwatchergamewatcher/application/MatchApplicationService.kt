@@ -4,7 +4,6 @@ import de.lausi95.gsvrankedwatchergamewatcher.domain.model.match.MatchCrawler
 import de.lausi95.gsvrankedwatchergamewatcher.domain.model.match.MatchReporter
 import de.lausi95.gsvrankedwatchergamewatcher.domain.model.match.MatchRepository
 import de.lausi95.gsvrankedwatchergamewatcher.domain.model.player.PlayerRepository
-import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 
 @Component
@@ -12,22 +11,22 @@ class MatchApplicationService(
   private val matchCrawler: MatchCrawler,
   private val matchRepository: MatchRepository,
   private val playerRepository: PlayerRepository,
-  private val matchReporter: MatchReporter
+  private val matchReporter: MatchReporter,
 ) {
 
-  private val log = LoggerFactory.getLogger(MatchApplicationService::class.java)
-
   fun crawlMatches() {
-    val players = playerRepository.getPlayers()
-    log.info("Reporting matches for summoners: ${players.map { it.summonerName }}")
-
-    val summonerIds = players.map { it.summonerId }
-    matchCrawler.crawlMatches(summonerIds, { !matchRepository.existsById(it) }) {
-      log.info("Reporting match ${it.matchId}.")
+    val summonerIds = playerRepository.getPlayers().map { it.summonerId }
+    matchCrawler.crawlMatches(summonerIds, ::shouldProcessMatch) {
       matchReporter.reportMatch(it)
-
-      log.info("Marking match ${it.matchId} as reported.")
-      matchRepository.save(it)
     }
+  }
+
+  private fun shouldProcessMatch(matchId: String): Boolean {
+    if (matchRepository.existsById(matchId)) {
+      return false
+    }
+
+    matchRepository.save(matchId)
+    return true
   }
 }
