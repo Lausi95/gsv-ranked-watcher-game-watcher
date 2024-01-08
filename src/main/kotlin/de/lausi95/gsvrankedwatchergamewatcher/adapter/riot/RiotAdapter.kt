@@ -1,5 +1,6 @@
 package de.lausi95.gsvrankedwatchergamewatcher.adapter.riot
 
+import de.lausi95.gsvrankedwatchergamewatcher.domain.model.player.SummonerId
 import org.springframework.web.client.RestTemplate
 
 data class MatchDto(
@@ -38,8 +39,8 @@ internal class RiotAdapter(
   private val restTemplate: RestTemplate,
 ) {
 
-  fun getLatestMatchIds(summonerId: String, count: Int = 1): List<String> {
-    val url = "/lol/match/v5/matches/by-puuid/$summonerId/ids?count=$count"
+  fun getLatestMatchIds(summonerId: SummonerId, count: Int = 1): List<String> {
+    val url = "/lol/match/v5/matches/by-puuid/${summonerId.value}/ids?count=$count"
     val matchIds = restTemplate.getForObject(url, Array<String>::class.java)
     return matchIds?.toList()!!
   }
