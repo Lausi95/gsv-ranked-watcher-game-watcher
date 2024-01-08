@@ -22,6 +22,7 @@ data class InfoDto(
 data class ParticipantDto(
   val win: Boolean,
   val summonerId: String,
+  val puuid: String,
   val summonerName: String,
   val championName: String,
   val role: String,

@@ -30,7 +30,7 @@ private class RiotMatchCrawler(private val riotAdapter: RiotAdapter) : MatchCraw
 
   fun mapToMatch(matchDto: MatchDto, summonerIds: List<String>): Match {
     val participantDtos = matchDto.info.participants.filter {
-      summonerIds.contains(it.summonerId)
+      summonerIds.contains(it.puuid)
     }
 
     val win = participantDtos.any { it.win }
